@@ -18,7 +18,7 @@ _"Super Analogue Stick Picture Processing Unit"_ (SASPPU) is a custom graphics e
 * Disable the background and sprite layers if they are not needed.
 * Colour 0 is transparent and allows backgrounds to have holes and sprites to not be squares.
 * Both a main screen and a sub screen, which can be combined into one as a final step using per pixel mathematical operations.
-* Changable solid background colour for both main and sub screen.
+* Changeable solid background colour for both main and sub screen.
 * Ability to send each background and individual sprite to either the main screen or the sub screen, or both.
 * Two "windows", which allow you to mask off parts of the screen using boolean operations.
 * Per background and individual sprite window settings.
@@ -56,6 +56,7 @@ As an app developer you will only ever need to worry about the first step. The o
 
 ### Additional Reading
 Although not entirely applicable to SASPPU, a good primer on how the SNES renders to the screen is available [here](https://www.youtube.com/playlist?list=PLHQ0utQyFw5KCcj1ljIhExH_lvGwfn6GV).
+
 The following videos are most useful:
 * [Objects](https://www.youtube.com/watch?v=sheOZ-Dlleo)
 * [Backgrounds and Rendering](https://www.youtube.com/watch?v=uRjf8ZP6rs8)
@@ -113,7 +114,7 @@ SASPPU uses 16 bits to encode a colour, which are laid out as follows:
 CRRRRRGGGGGBBBBB
 ```
 where:
- * C - [color math](#colormath) enable bit
+ * C - [color math](#color-math) enable bit
  * R - red component, 0-31
  * G - green component, 0-31
  * B - blue component, 0-31
@@ -130,7 +131,7 @@ You may construct these colours yourself, but additionally there are helper macr
 
 Backgrounds are massive screen sized images that can be scrolled around. SASPPU provides two backgrounds, each 512x512 pixels in size.
 
-Backgounds are composed of many 8x8 pixel tiles, which are stored in the background [graphics memory](#Memories). A tilemap dictates which tiles are used and where.
+Backgrounds are composed of many 8x8 pixel tiles, which are stored in the background [graphics memory](#memories). A tilemap dictates which tiles are used and where.
 
 Unlike sprites, a background has no bounds and can be considered infinite. If a background is scrolled past its borders, it seamlessly wraps around. That is to say, if you were to scroll a background 512 pixels in any direction you would end up with the same image.
 As the background is infinite if you wish to see what is behind the background tiles should use the transparent colour to poke holes.
@@ -139,7 +140,7 @@ Each of the two backgrounds can be entirely disabled in the MainState flags.
 
 #### Tilemap
 
-The tilemap is a 32x32 character array which dictates what tiles are used in a background and where. When drawing a backgound, SASPPU will first read the tilemap, and then use the pointers there to read the actual background pixel data.
+The tilemap is a 32x32 character array which dictates what tiles are used in a background and where. When drawing a background, SASPPU will first read the tilemap, and then use the pointers there to read the actual background pixel data.
 
 Each tile map entry is 16 bits, and is laid out as follows:
 
@@ -164,20 +165,20 @@ Access to the background tilemaps is performed directly, in both C and micropyth
 | C     | Micropython   | Summary |
 | ----- | ------------- | ------- |
 | Background | sasppu.Background |  Struct/class containing all background state |
-| SASPPU_bg0_state | Backgound.bind(0) | The state of background 0 |
-| SASPPU_bg1_state | Backgound.bind(1) | The state of background 1 |
+| SASPPU_bg0_state | Background.bind(0) | The state of background 0 |
+| SASPPU_bg1_state | Background.bind(1) | The state of background 1 |
 | SASPPU_bg0 | sasppu.bg0 | The tilemap for background 0 |
 | SASPPU_bg1 | sasppu.bg1 | The tilemap for background 1 |
 | SASPPU_background | N/A | The pixel data for both backgrounds |
-| Background.x | Backgound.x | The horizontal scroll position of the background |
-| Background.y | Backgound.y | The vertical scroll position of the background |
-| Background.windows | Backgound.windows | The windowing state for the background |
-| Background.flags | Backgound.flags | Additional boolean values for the background |
-| BG_C_MATH | Backgound.C_MATH | Flag to force color math on for all pixels of the background |
-| BG_WIDTH | Backgound.WIDTH | Width of a background (512) |
-| BG_HEIGHT | Backgound.HEIGHT | Height of a background (512) |
-| BG_WIDTH_POWER | Backgound.WIDTH_POWER | Width of a background log2 (9) |
-| BG_HEIGHT_POWER | Backgound.HEIGHT_POWER | Height of a background log2 (9) |
+| Background.x | Background.x | The horizontal scroll position of the background |
+| Background.y | Background.y | The vertical scroll position of the background |
+| Background.windows | Background.windows | The windowing state for the background |
+| Background.flags | Background.flags | Additional boolean values for the background |
+| BG_C_MATH | Background.C_MATH | Flag to force color math on for all pixels of the background |
+| BG_WIDTH | Background.WIDTH | Width of a background (512) |
+| BG_HEIGHT | Background.HEIGHT | Height of a background (512) |
+| BG_WIDTH_POWER | Background.WIDTH_POWER | Width of a background log2 (9) |
+| BG_HEIGHT_POWER | Background.HEIGHT_POWER | Height of a background log2 (9) |
 
 ### Windows
 
@@ -248,7 +249,7 @@ In C, all registers are available static variables. This presents a challenge fo
 
 Instead, micropython uses a binding model. Any instance of a state, background or sprite may become synchronised with the underlying static version by calling `.bind`. By default, this will copy the current values into your version - if you wish to store the values you have you may call `.bind(True)`.
 
-Once bound, all reads and writes to the class will be performed on the static versions of the class. Once finished, the class may be `unbound`, where afterwards its data is seperate from the underlying static values.
+Once bound, all reads and writes to the class will be performed on the static versions of the class. Once finished, the class may be `unbound`, where afterwards its data is separate from the underlying static values.
 
 You may also call `get_bind_point`, which returns whether a class is bound, and if applicable where.
 
